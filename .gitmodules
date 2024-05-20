@@ -1,0 +1,3 @@
+[submodule "primevue-app"]
+	path = primevue-app
+	url = git@github.com:devluixos/werkschau_primevue.git
