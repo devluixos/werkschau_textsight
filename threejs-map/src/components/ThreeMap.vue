@@ -13,17 +13,23 @@
 import * as THREE from 'three';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 import PrimeDialog from 'primevue/dialog';
-import Model1Content from './Model1Content.vue';
-import Model2Content from './Model2Content.vue';
 import { createScene, createCamera, createRenderer, addLights, loadSkybox, createGround } from '@/utils/threeSetup';
 import { initializeControls } from '@/utils/controls';
 import { onObjectClick } from '@/utils/interactivity';
 
+//Content for Modals
+import Abstract from './1_Abstract.vue';
+import Intro1 from './2_IntroProblemspace.vue';	
+import Intro2 from './2_IntroResearch.vue';
+import Intro3 from './2_Stakeholders.vue';
+
 export default {
   components: {
     PrimeDialog,
-    Model1Content,
-    Model2Content,
+    Abstract,
+    Intro1,
+    Intro2,
+    Intro3,
   },
   data() {
     return {
@@ -31,9 +37,10 @@ export default {
       selectedModel: null,
       currentComponent: null,
       models: [
-        { id: 1, title: 'Model 1', component: 'Model1Content', position: new THREE.Vector3(0, 1, 0), type: 'stl', path: '/models/Boston_Rowhouse_Detailed.stl' },
-        { id: 2, title: 'Model 2', component: 'Model2Content', position: new THREE.Vector3(2, 1, 0), type: 'stl', path: '/models/Boston_Rowhouse_Detailed.stl' },
-        { id: 3, title: 'Model 3', component: 'Model2Content', position: new THREE.Vector3(4, 1, 0), type: 'stl', path: '/models/Boston_Rowhouse_Detailed.stl' },
+        { id: 1, title: 'Model 1', component: 'Abstract', position: new THREE.Vector3(0, 1, 0), type: 'stl', path: '/models/Boston_Rowhouse_Detailed.stl' },
+        { id: 2, title: 'Model 2', component: 'Intro1', position: new THREE.Vector3(2, 1, 0), type: 'stl', path: '/models/Boston_Rowhouse_Detailed.stl' },
+        { id: 3, title: 'Model 3', component: 'Intro2', position: new THREE.Vector3(4, 1, 0), type: 'stl', path: '/models/Boston_Rowhouse_Detailed.stl' },
+        { id: 4, title: 'Model 4', component: 'Intro3', position: new THREE.Vector3(6, 1, 0), type: 'stl', path: '/models/Boston_Rowhouse_Detailed.stl' },
       ],
       meshes: [],
       nonClickableObjects: [],
@@ -64,29 +71,34 @@ export default {
 
       this.models.forEach(model => {
         if (model.type === 'stl') {
-          this.loadSTLModel(model.path, model.position.toArray(), [0.01, 0.01, 0.01]);
+          this.loadSTLModel(model.path, model.position.toArray(), [0.01, 0.01, 0.01], model);
         }
       });
 
       this.controls = initializeControls(this.camera, this.renderer);
 
-      this.renderer.domElement.addEventListener('click', (event) => onObjectClick(event, this.camera, this.scene, this.meshes, this.nonClickableObjects, (object) => {
-        this.selectedModel = object.userData;
-        this.currentComponent = this.selectedModel.component;
-        this.showModal = true;
-      }));
+      this.renderer.domElement.addEventListener('click', (event) => this.handleObjectClick(event));
 
       this.animate();
     },
-    loadSTLModel(path, position, scale) {
+    loadSTLModel(path, position, scale, modelData) {
       const loader = new STLLoader();
       loader.load(path, (geometry) => {
         const material = new THREE.MeshStandardMaterial({ color: 0x0055ff });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.set(...position);
         mesh.scale.set(...scale);
+        mesh.userData = modelData; // Attach model data to mesh
         this.scene.add(mesh);
         this.meshes.push(mesh);
+      });
+    },
+    handleObjectClick(event) {
+      onObjectClick(event, this.camera, this.scene, this.meshes, this.nonClickableObjects, (object) => {
+        console.log('Clicked object:', object.userData); // Debugging log
+        this.selectedModel = object.userData;
+        this.currentComponent = this.selectedModel.component;
+        this.showModal = true;
       });
     },
     animate() {
