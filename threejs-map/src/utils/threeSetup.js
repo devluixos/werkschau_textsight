@@ -52,7 +52,7 @@ export function createGround(scene) {
   groundTexture.wrapT = THREE.RepeatWrapping;
   groundTexture.repeat.set(10, 10);
 
-  const planeGeometry = new THREE.PlaneGeometry(100, 100);
+  const planeGeometry = new THREE.PlaneGeometry(60, 40);
   const planeMaterial = new THREE.MeshStandardMaterial({ map: groundTexture });
   const plane = new THREE.Mesh(planeGeometry, planeMaterial);
   plane.rotation.x = -Math.PI / 2; // Rotate the plane to lie flat
